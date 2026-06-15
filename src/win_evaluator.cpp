@@ -3,11 +3,8 @@
 Symbol WinEvaluator::GetBaseSymbol(const Screen &screen, int reel, int row) {
   Symbol sym = screen.GetSymbol(reel, row);
 
-  // Ako je Wild, tražimo prvi ne-Wild simbol od pozicije 0 pa nadalje
   if (sym == Symbol::Wild) {
-    // Ovo će se koristiti za određivanje baznog simbola za paylinu
-    return Symbol::Wild; // Vraćamo Wild, ali će logika kasnije tretirati
-                         // posebno
+    return Symbol::Wild;
   }
   return sym;
 }
@@ -16,51 +13,85 @@ int WinEvaluator::CountMatches(const Screen &screen,
                                const std::vector<int> &rows,
                                Symbol &matchedSymbol) {
   int matches = 0;
-  matchedSymbol = Symbol::Wild; // Počinjemo sa Wild kao placeholder
+  matchedSymbol = Symbol::Wild;
 
   for (size_t reel = 0; reel < rows.size(); ++reel) {
     Symbol current = screen.GetSymbol(reel, rows[reel]);
 
-    // Ako je trenutni simbol Wild
+    // Ignoriši Scatter u regularnim paylinama
+    if (current == Symbol::Scatter) {
+      continue;
+    }
+
     if (current == Symbol::Wild) {
       matches++;
       continue;
     }
 
-    // Ako smo tek počeli ili je matchedSymbol još uvek Wild
     if (matchedSymbol == Symbol::Wild) {
       matchedSymbol = current;
       matches++;
       continue;
     }
 
-    // Ako se podudara sa matchedSymbol
     if (current == matchedSymbol) {
       matches++;
     } else {
-      // Prekidamo niz ako nije Wild i ne podudara se
       break;
     }
   }
 
-  // Ako su svi simboli Wild, matchedSymbol ostaje Wild (što nema payout)
-  // Ako imamo bar jedan pravi simbol, matchedSymbol je taj simbol
   return matches;
+}
+
+int WinEvaluator::CountScatterSymbols(const Screen &screen) {
+  int count = 0;
+
+  // Prolazi kroz sve kolone (reelove) i sve redove
+  for (int reel = 0; reel < screen.Columns(); ++reel) {
+    for (int row = 0; row < screen.Rows(); ++row) {
+      if (screen.GetSymbol(reel, row) == Symbol::Scatter) {
+        count++;
+      }
+    }
+  }
+
+  return count;
+}
+
+std::vector<WinningLine>
+WinEvaluator::EvaluateScatter(const Screen &screen, const GameConfig &config) {
+  std::vector<WinningLine> scatterWins;
+
+  int scatterCount = CountScatterSymbols(screen);
+
+  if (scatterCount >= 3) {
+    // Scatter isplaćuje na 3, 4 ili 5 simbola gde god da se pojave
+    int payout = config.paytable.GetPayout(Symbol::Scatter, scatterCount);
+
+    if (payout > 0) {
+      // Specijalan paylineIndex = -1 označava da je scatter dobitak (nije na
+      // paylini)
+      scatterWins.push_back({-1, Symbol::Scatter, scatterCount, payout});
+    }
+  }
+
+  return scatterWins;
 }
 
 std::vector<WinningLine> WinEvaluator::Evaluate(const Screen &screen,
                                                 const GameConfig &config) {
   std::vector<WinningLine> wins;
 
+  // Evaluacija regularnih paylina (ignorišu Scatter)
   for (size_t lineIndex = 0; lineIndex < config.paylines.size(); ++lineIndex) {
     const auto &payline = config.paylines[lineIndex];
 
     Symbol matchedSymbol;
     int matches = CountMatches(screen, payline.rows, matchedSymbol);
 
-    // Proveravamo samo ako imamo 3+ podudaranja i matchedSymbol nije Wild
-    // (Wild nema svoj payout, samo zamenjuje druge simbole)
-    if (matches >= 3 && matchedSymbol != Symbol::Wild) {
+    if (matches >= 3 && matchedSymbol != Symbol::Wild &&
+        matchedSymbol != Symbol::Scatter) {
       int payout = config.paytable.GetPayout(matchedSymbol, matches);
 
       if (payout > 0) {
@@ -69,6 +100,10 @@ std::vector<WinningLine> WinEvaluator::Evaluate(const Screen &screen,
       }
     }
   }
+
+  // Evaluacija scatter dobitaka (dodajemo na regularne dobitke)
+  std::vector<WinningLine> scatterWins = EvaluateScatter(screen, config);
+  wins.insert(wins.end(), scatterWins.begin(), scatterWins.end());
 
   return wins;
 }

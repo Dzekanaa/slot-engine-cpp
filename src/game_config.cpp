@@ -7,67 +7,84 @@ GameConfig::GameConfig(int paylineCount) {
   SetupDefaultPaytable(paytable);
 }
 
-std::vector<Reel> GameConfig::CreateDefaultReels() {
-  // Retki simboli (visok payout): A, K
-  // Česti simboli (nizak payout): Five, Six, Seven, Eight, Nine
+// U SetupDefaultPaytable metodi dodaj:
+void GameConfig::SetupDefaultPaytable(PayTable &paytable) {
+  // Scatter payout (bilo gde na ekranu)
+  paytable.SetPayout(Symbol::Scatter, 10, 50, 250); // 3, 4 ili 5 scatter-a
 
-  // Reel 1 - najviše niskih simbola
+  // Visoki payouti - retki simboli
+  paytable.SetPayout(Symbol::A, 50, 200, 1000);
+  paytable.SetPayout(Symbol::K, 30, 150, 750);
+  paytable.SetPayout(Symbol::Q, 20, 100, 500);
+
+  // Srednji payouti
+  paytable.SetPayout(Symbol::J, 15, 75, 300);
+  paytable.SetPayout(Symbol::Ten, 12, 60, 250);
+
+  // Niski payouti - česti simboli
+  paytable.SetPayout(Symbol::Nine, 10, 50, 200);
+  paytable.SetPayout(Symbol::Eight, 8, 40, 150);
+  paytable.SetPayout(Symbol::Seven, 6, 30, 100);
+  paytable.SetPayout(Symbol::Six, 5, 20, 75);
+  paytable.SetPayout(Symbol::Five, 4, 15, 50);
+
+  // Wild nema payout
+}
+
+// U CreateDefaultReels metodi dodaj Scatter na neke pozicije:
+std::vector<Reel> GameConfig::CreateDefaultReels() {
+  // Reel 1
   std::vector<Symbol> reel1Strip = {
-      Symbol::Five,  Symbol::Five,  Symbol::Six,   Symbol::Six,  Symbol::Seven,
-      Symbol::Seven, Symbol::Eight, Symbol::Eight, Symbol::Nine, Symbol::Nine,
-      Symbol::T,     Symbol::T,     Symbol::J,     Symbol::J,    Symbol::Q,
-      Symbol::Q,     Symbol::K,     Symbol::A};
+      Symbol::Five,  Symbol::Five,  Symbol::Six,    Symbol::Six,
+      Symbol::Seven, Symbol::Seven, Symbol::Eight,  Symbol::Eight,
+      Symbol::Nine,  Symbol::Nine,  Symbol::Ten,    Symbol::Ten,
+      Symbol::J,     Symbol::J,     Symbol::Q,      Symbol::Q,
+      Symbol::K,     Symbol::A,     Symbol::Scatter // Dodaj Scatter
+  };
 
   // Reel 2
-  std::vector<Symbol> reel2Strip = {
-      Symbol::Five,  Symbol::Six,   Symbol::Six,  Symbol::Seven, Symbol::Seven,
-      Symbol::Eight, Symbol::Eight, Symbol::Nine, Symbol::Nine,  Symbol::T,
-      Symbol::T,     Symbol::J,     Symbol::J,    Symbol::Q,     Symbol::K,
-      Symbol::K,     Symbol::A,     Symbol::A};
+  std::vector<Symbol> reel2Strip =
+      {
+          Symbol::Five,  Symbol::Six,   Symbol::Six,    Symbol::Seven,
+          Symbol::Seven, Symbol::Eight, Symbol::Eight,  Symbol::Nine,
+          Symbol::Nine,  Symbol::Ten,   Symbol::Ten,    Symbol::J,
+          Symbol::J,     Symbol::Q,     Symbol::K,      Symbol::K,
+          Symbol::A,     Symbol::A,     Symbol::Scatter // Dodaj Scatter
+      };
 
-  // Reel 3 - centralni reel, više visokih simbola
+  // Reel 3 - centralni reel, više šansi za scatter
   std::vector<Symbol> reel3Strip = {
-      Symbol::Five, Symbol::Six, Symbol::Seven, Symbol::Eight, Symbol::Nine,
-      Symbol::Nine, Symbol::T,   Symbol::T,     Symbol::J,     Symbol::J,
-      Symbol::Q,    Symbol::Q,   Symbol::K,     Symbol::K,     Symbol::K,
-      Symbol::A,    Symbol::A,   Symbol::A};
+      Symbol::Five,    Symbol::Six,    Symbol::Seven,
+      Symbol::Eight,   Symbol::Nine,   Symbol::Nine,
+      Symbol::Ten,     Symbol::Ten,    Symbol::J,
+      Symbol::J,       Symbol::Q,      Symbol::Q,
+      Symbol::K,       Symbol::K,      Symbol::K,
+      Symbol::A,       Symbol::A,      Symbol::A,
+      Symbol::Scatter, Symbol::Scatter // Dva scatter-a
+  };
 
   // Reel 4
-  std::vector<Symbol> reel4Strip = {
-      Symbol::Five,  Symbol::Five,  Symbol::Six,  Symbol::Six, Symbol::Seven,
-      Symbol::Seven, Symbol::Eight, Symbol::Nine, Symbol::T,   Symbol::T,
-      Symbol::J,     Symbol::Q,     Symbol::Q,    Symbol::K,   Symbol::K,
-      Symbol::A,     Symbol::A,     Symbol::Wild};
+  std::vector<Symbol> reel4Strip =
+      {
+          Symbol::Five,  Symbol::Five,  Symbol::Six,    Symbol::Six,
+          Symbol::Seven, Symbol::Seven, Symbol::Eight,  Symbol::Nine,
+          Symbol::Ten,   Symbol::Ten,   Symbol::J,      Symbol::Q,
+          Symbol::Q,     Symbol::K,     Symbol::K,      Symbol::A,
+          Symbol::A,     Symbol::Wild,  Symbol::Scatter // Dodaj Scatter
+      };
 
-  // Reel 5 - najviše šansi za velike dobitke
-  std::vector<Symbol> reel5Strip = {
-      Symbol::Five, Symbol::Six,  Symbol::Seven, Symbol::Eight, Symbol::Nine,
-      Symbol::T,    Symbol::J,    Symbol::J,     Symbol::Q,     Symbol::Q,
-      Symbol::K,    Symbol::K,    Symbol::K,     Symbol::A,     Symbol::A,
-      Symbol::A,    Symbol::Wild, Symbol::Wild};
+  // Reel 5
+  std::vector<Symbol> reel5Strip =
+      {
+          Symbol::Five, Symbol::Six,  Symbol::Seven,  Symbol::Eight,
+          Symbol::Nine, Symbol::Ten,  Symbol::J,      Symbol::J,
+          Symbol::Q,    Symbol::Q,    Symbol::K,      Symbol::K,
+          Symbol::K,    Symbol::A,    Symbol::A,      Symbol::A,
+          Symbol::Wild, Symbol::Wild, Symbol::Scatter // Dodaj Scatter
+      };
 
   return {Reel(reel1Strip), Reel(reel2Strip), Reel(reel3Strip),
           Reel(reel4Strip), Reel(reel5Strip)};
-}
-
-void GameConfig::SetupDefaultPaytable(PayTable &paytable) {
-  // Visoki payouti - retki simboli
-  paytable.SetPayout(Symbol::A, 50, 200, 1000); // As - veoma redak
-  paytable.SetPayout(Symbol::K, 30, 150, 750);  // Kralj - redak
-  paytable.SetPayout(Symbol::Q, 20, 100, 500);  // Damа - srednje redak
-
-  // Srednji payouti
-  paytable.SetPayout(Symbol::J, 15, 75, 300); // Žandar
-  paytable.SetPayout(Symbol::T, 12, 60, 250); // Desetka
-
-  // Niski payouti - česti simboli
-  paytable.SetPayout(Symbol::Nine, 10, 50, 200); // Devetka
-  paytable.SetPayout(Symbol::Eight, 8, 40, 150); // Osmica
-  paytable.SetPayout(Symbol::Seven, 6, 30, 100); // Sedmica
-  paytable.SetPayout(Symbol::Six, 5, 20, 75);    // Šestica
-  paytable.SetPayout(Symbol::Five, 4, 15, 50);   // Petica
-
-  // Wild nema payout, samo zamenjuje druge simbole
 }
 
 std::vector<Payline> GameConfig::CreatePaylines(int count) {
