@@ -1,50 +1,39 @@
+#include "../include/game_config.h"
+#include "../include/slot_engine.h"
 #include <iostream>
-#include <random>
 
-#include "../include/spin_engine.h"
-
-void PrintScreen(const Screen &screen) {
-  for (int row = 0; row < screen.Rows(); row++) {
-    for (int col = 0; col < screen.Columns(); col++) {
-      std::cout << SymbolToString(screen.GetSymbol(col, row)) << " ";
-    }
-
-    std::cout << '\n';
-  }
-}
+using namespace SlotEngine;
 
 int main() {
-  GameConfig config(40);
+  std::cout << "Testing Slot Engine...\n";
 
-  std::mt19937 rng(std::random_device{}());
+  // Kreiraj default konfiguraciju
+  GameConfig config(20); // 20 paylines
 
-  SpinEngine engine(config);
+  // Kreiraj engine
+  auto engine = CreateSlotEngine(config);
 
-  auto result = engine.Spin(rng);
+  // Izvrši nekoliko spinova
+  const int numSpins = 10;
+  int totalWins = 0;
 
-  std::cout << "\nSCREEN\n\n";
+  for (int i = 0; i < numSpins; ++i) {
+    auto result = engine->Spin();
+    totalWins += result.totalWin;
 
-  PrintScreen(result.screen);
+    std::cout << "Spin " << i + 1 << ": Won " << result.totalWin
+              << " coins (Base: " << result.baseGameWin
+              << ", Scatter: " << result.scatterWin
+              << ", Bonus: " << result.bonusWin << ")\n";
 
-  std::cout << "\nTOTAL WIN: " << result.totalWin << "\n";
-
-  for (const auto &win : result.winningLines) {
-    std::cout << "Line " << win.paylineIndex << " "
-              << SymbolToString(win.symbol) << " x" << win.matchCount << " -> "
-              << win.payout << "\n";
+    if (result.triggeredFreeSpins) {
+      std::cout << "  -> Triggered " << result.freeSpinsAwarded
+                << " free spins!\n";
+    }
   }
 
-  long long totalBet = 0;
-  long long totalWin = 0;
+  std::cout << "\nTotal wins after " << numSpins << " spins: " << totalWins
+            << "\n";
 
-  for (long long i = 0; i < 1000000; i++) {
-    auto spin = engine.Spin(rng);
-
-    totalBet += 1;
-    totalWin += spin.totalWin;
-  }
-
-  double rtp = static_cast<double>(totalWin) / static_cast<double>(totalBet);
-
-  std::cout << "rtp: " << rtp * 100 << '%' << std::endl;
+  return 0;
 }

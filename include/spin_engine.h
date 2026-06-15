@@ -1,16 +1,19 @@
 #pragma once
-
-#include <random>
-
 #include "game_config.h"
 #include "spin_result.h"
+#include <random>
+
+namespace SlotEngine {
 
 class SpinEngine {
+public:
+  explicit SpinEngine(const GameConfig &config);
+
+  SpinResult PerformSpin(std::mt19937 &rng);
+
 private:
   GameConfig config;
-
-public:
-  explicit SpinEngine(GameConfig config);
-
-  SpinResult Spin(std::mt19937 &rng) const;
+  int GetFreeSpinsCount(int scatterCount) const;
 };
+
+} // namespace SlotEngine

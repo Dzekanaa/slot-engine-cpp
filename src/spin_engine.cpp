@@ -1,36 +1,85 @@
 #include "../include/spin_engine.h"
+#include "../include/screen.h"
 #include "../include/win_evaluator.h"
+#include <random>
 
-SpinEngine::SpinEngine(GameConfig config) : config(std::move(config)) {}
+namespace SlotEngine {
 
-SpinResult SpinEngine::Spin(std::mt19937 &rng) const {
+SpinEngine::SpinEngine(const GameConfig &cfg) : config(cfg) {}
+
+SpinResult SpinEngine::PerformSpin(std::mt19937 &rng) {
   SpinResult result;
 
-  std::vector<std::vector<Symbol>> columns;
-
-  for (const Reel &reel : config.reels) {
+  // 1. Generiši vidljive simbole
+  std::vector<std::vector<Symbol>> visibleSymbols;
+  for (const auto &reel : config.reels) {
     std::uniform_int_distribution<int> dist(0, reel.Size() - 1);
+    int startPos = dist(rng);
 
-    int stop = dist(rng);
-
-    result.stopPositions.push_back(stop);
-
-    std::vector<Symbol> visible;
-
-    for (int row = 0; row < config.visibleRows; row++) {
-      visible.push_back(reel.GetSymbol(stop + row));
+    std::vector<Symbol> column;
+    for (int row = 0; row < config.visibleRows; ++row) {
+      column.push_back(reel.GetSymbol(startPos + row));
     }
-
-    columns.push_back(visible);
+    visibleSymbols.push_back(column);
   }
 
-  result.screen = Screen(columns);
+  Screen screen(visibleSymbols);
 
-  result.winningLines = WinEvaluator::Evaluate(result.screen, config);
+  // 2. Evaluacija svih dobitaka
+  auto wins = WinEvaluator::Evaluate(screen, config);
 
-  for (const auto &win : result.winningLines) {
+  // 3. Popuni rezultat
+  result.totalWin = 0;
+  result.baseGameWin = 0;
+  result.scatterWin = 0;
+  result.bonusWin = 0;
+  result.triggeredFreeSpins = false;
+  result.freeSpinsAwarded = 0;
+
+  for (const auto &win : wins) {
     result.totalWin += win.payout;
+    result.winningLines.push_back(win);
+
+    if (win.paylineIndex == -1 || win.symbol == Symbol::Scatter) {
+      result.scatterWin += win.payout;
+
+      if (config.enableFreeSpins && win.matchCount >= 3) {
+        result.triggeredFreeSpins = true;
+        result.freeSpinsAwarded = GetFreeSpinsCount(win.matchCount);
+      }
+    } else {
+      result.baseGameWin += win.payout;
+    }
+  }
+
+  // 4. Simuliraj free spinove
+  if (result.triggeredFreeSpins && config.enableFreeSpins) {
+    int freeSpinsRemaining = result.freeSpinsAwarded;
+    int freeSpinsMultiplier = 2;
+
+    while (freeSpinsRemaining > 0) {
+      auto freeSpinResult = PerformSpin(rng);
+      result.bonusWin += freeSpinResult.totalWin * freeSpinsMultiplier;
+      freeSpinsRemaining--;
+    }
+
+    result.totalWin += result.bonusWin;
   }
 
   return result;
 }
+
+int SpinEngine::GetFreeSpinsCount(int scatterCount) const {
+  switch (scatterCount) {
+  case 3:
+    return 10;
+  case 4:
+    return 15;
+  case 5:
+    return 20;
+  default:
+    return 0;
+  }
+}
+
+} // namespace SlotEngine
