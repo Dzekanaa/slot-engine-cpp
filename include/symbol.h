@@ -2,10 +2,12 @@
 
 #include <string>
 
-enum class Symbol { A, K, Q, J, T, Nine, Eight, Seven, Six, Five };
+enum class Symbol { Wild, A, K, Q, J, T, Nine, Eight, Seven, Six, Five };
 
 inline std::string SymbolToString(Symbol s) {
   switch (s) {
+  case Symbol::Wild:
+    return "W";
   case Symbol::A:
     return "A";
   case Symbol::K:
