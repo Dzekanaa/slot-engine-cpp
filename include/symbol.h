@@ -1,6 +1,7 @@
 #pragma once
-
 #include <string>
+
+namespace SlotEngine { // ← DODAJ
 
 enum class Symbol {
   Wild,
@@ -43,7 +44,9 @@ inline std::string SymbolToString(Symbol s) {
     return "6";
   case Symbol::Five:
     return "5";
+  default:
+    return "?";
   }
+}
 
-  return "?";
-};
+} // namespace SlotEngine

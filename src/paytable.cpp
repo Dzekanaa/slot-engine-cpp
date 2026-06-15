@@ -1,5 +1,7 @@
 #include "../include/paytable.h"
 
+namespace SlotEngine {
+
 void PayTable::SetPayout(Symbol symbol, int three, int four, int five) {
   payouts[(int)symbol] = {three, four, five};
 }
@@ -21,3 +23,5 @@ int PayTable::GetPayout(Symbol symbol, int count) const {
 
   return 0;
 }
+
+} // namespace SlotEngine

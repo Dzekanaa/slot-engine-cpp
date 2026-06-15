@@ -10,6 +10,15 @@ class WinEvaluator {
 public:
   static std::vector<WinningLine> Evaluate(const Screen &screen,
                                            const GameConfig &config);
+
+  static std::vector<WinningLine> EvaluateScatter(const Screen &screen,
+                                                  const GameConfig &config);
+
+private:
+  static Symbol GetBaseSymbol(const Screen &screen, int reel, int row);
+  static int CountMatches(const Screen &screen, const std::vector<int> &rows,
+                          Symbol &matchedSymbol);
+  static int CountScatterSymbols(const Screen &screen);
 };
 
 } // namespace SlotEngine

@@ -1,4 +1,8 @@
 #include "../include/win_evaluator.h"
+#include "../include/game_config.h"
+#include "../include/screen.h"
+
+namespace SlotEngine {
 
 Symbol WinEvaluator::GetBaseSymbol(const Screen &screen, int reel, int row) {
   Symbol sym = screen.GetSymbol(reel, row);
@@ -66,12 +70,9 @@ WinEvaluator::EvaluateScatter(const Screen &screen, const GameConfig &config) {
   int scatterCount = CountScatterSymbols(screen);
 
   if (scatterCount >= 3) {
-    // Scatter isplaćuje na 3, 4 ili 5 simbola gde god da se pojave
     int payout = config.paytable.GetPayout(Symbol::Scatter, scatterCount);
 
     if (payout > 0) {
-      // Specijalan paylineIndex = -1 označava da je scatter dobitak (nije na
-      // paylini)
       scatterWins.push_back({-1, Symbol::Scatter, scatterCount, payout});
     }
   }
@@ -83,7 +84,7 @@ std::vector<WinningLine> WinEvaluator::Evaluate(const Screen &screen,
                                                 const GameConfig &config) {
   std::vector<WinningLine> wins;
 
-  // Evaluacija regularnih paylina (ignorišu Scatter)
+  // Evaluacija regularnih paylina
   for (size_t lineIndex = 0; lineIndex < config.paylines.size(); ++lineIndex) {
     const auto &payline = config.paylines[lineIndex];
 
@@ -101,9 +102,11 @@ std::vector<WinningLine> WinEvaluator::Evaluate(const Screen &screen,
     }
   }
 
-  // Evaluacija scatter dobitaka (dodajemo na regularne dobitke)
+  // Dodaj scatter dobitke
   std::vector<WinningLine> scatterWins = EvaluateScatter(screen, config);
   wins.insert(wins.end(), scatterWins.begin(), scatterWins.end());
 
   return wins;
 }
+
+} // namespace SlotEngine

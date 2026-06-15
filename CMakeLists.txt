@@ -14,4 +14,5 @@ add_executable(slot
     src/spin_engine.cpp
     src/win_evaluator.cpp
     src/game_config.cpp
+    src/slot_engine.cpp
 )

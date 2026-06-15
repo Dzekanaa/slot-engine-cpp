@@ -24,6 +24,11 @@ struct GameConfig {
   static GameConfig CreateClassicConfig();
   static GameConfig CreateHighVolatilityConfig();
   static GameConfig CreateLowVolatilityConfig();
+
+private:
+  static std::vector<Payline> CreatePaylines(int count);
+  static std::vector<Reel> CreateDefaultReels();
+  static void SetupDefaultPaytable(PayTable &paytable);
 };
 
 } // namespace SlotEngine

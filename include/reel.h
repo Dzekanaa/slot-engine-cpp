@@ -3,6 +3,8 @@
 #include "symbol.h"
 #include <vector>
 
+namespace SlotEngine {
+
 class Reel {
 private:
   std::vector<Symbol> strip;
@@ -15,3 +17,4 @@ public:
 
   int Size() const;
 };
+} // namespace SlotEngine
