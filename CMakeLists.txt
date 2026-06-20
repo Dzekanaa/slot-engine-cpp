@@ -23,3 +23,21 @@ target_include_directories(slot_engine
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+target_include_directories(slot_engine
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+# Kreiraj testove SAMO ako je slot-engine glavni projekt
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    add_executable(slot_engine_test tests/main.cpp)
+    target_link_libraries(slot_engine_test slot_engine)
+    target_include_directories(slot_engine_test
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+    
+    enable_testing()
+    add_test(NAME slot_engine_test COMMAND slot_engine_test)
+endif()
