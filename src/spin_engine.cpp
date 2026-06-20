@@ -56,7 +56,7 @@ SpinResult SpinEngine::PerformSpin(std::mt19937 &rng, bool isFreeSpin) {
   // 4. Handle free spins - but only if triggered and not already in a free spin
   if (result.triggeredFreeSpins && !isFreeSpin && config.enableFreeSpins) {
     int freeSpinsRemaining = result.freeSpinsAwarded;
-    int freeSpinsMultiplier = 2; // Could be configurable
+    int freeSpinsMultiplier = 1; // Could be configurable
 
     // We'll simulate free spins without allowing further triggers
     // Use a separate loop but do NOT call PerformSpin recursively with trigger
