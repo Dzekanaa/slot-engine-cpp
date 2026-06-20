@@ -11,23 +11,20 @@ GameConfig::GameConfig(int paylineCount) {
 
 void GameConfig::SetupDefaultPaytable(PayTable &paytable) {
   // Scatter payout (bilo gde na ekranu)
-  paytable.SetPayout(Symbol::Scatter, 10, 50, 250);
-
+  paytable.SetPayout(Symbol::Scatter, 1, 5, 25);
   // Visoki payouti - retki simboli
-  paytable.SetPayout(Symbol::A, 50, 200, 1000);
-  paytable.SetPayout(Symbol::K, 30, 150, 750);
-  paytable.SetPayout(Symbol::Q, 20, 100, 500);
-
+  paytable.SetPayout(Symbol::A, 5, 20, 100);
+  paytable.SetPayout(Symbol::K, 3, 15, 75);
+  paytable.SetPayout(Symbol::Q, 2, 10, 50);
   // Srednji payouti
-  paytable.SetPayout(Symbol::J, 15, 75, 300);
-  paytable.SetPayout(Symbol::Ten, 12, 60, 250);
-
+  paytable.SetPayout(Symbol::J, 2, 8, 30);
+  paytable.SetPayout(Symbol::Ten, 1, 6, 25);
   // Niski payouti - česti simboli
-  paytable.SetPayout(Symbol::Nine, 10, 50, 200);
-  paytable.SetPayout(Symbol::Eight, 8, 40, 150);
-  paytable.SetPayout(Symbol::Seven, 6, 30, 100);
-  paytable.SetPayout(Symbol::Six, 5, 20, 75);
-  paytable.SetPayout(Symbol::Five, 4, 15, 50);
+  paytable.SetPayout(Symbol::Nine, 1, 5, 20);
+  paytable.SetPayout(Symbol::Eight, 1, 4, 15);
+  paytable.SetPayout(Symbol::Seven, 1, 3, 10);
+  paytable.SetPayout(Symbol::Six, 1, 2, 8);
+  paytable.SetPayout(Symbol::Five, 1, 2, 5);
 }
 
 std::vector<Reel> GameConfig::CreateDefaultReels() {
