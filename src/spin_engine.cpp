@@ -7,7 +7,7 @@ namespace SlotEngine {
 
 SpinEngine::SpinEngine(const GameConfig &cfg) : config(cfg) {}
 
-SpinResult SpinEngine::PerformSpin(std::mt19937 &rng) {
+SpinResult SpinEngine::PerformSpin(std::mt19937 &rng, bool isFreeSpinMode) {
   SpinResult result;
 
   // 1. Generiši vidljive simbole
@@ -15,7 +15,6 @@ SpinResult SpinEngine::PerformSpin(std::mt19937 &rng) {
   for (const auto &reel : config.reels) {
     std::uniform_int_distribution<int> dist(0, reel.Size() - 1);
     int startPos = dist(rng);
-
     std::vector<Symbol> column;
     for (int row = 0; row < config.visibleRows; ++row) {
       column.push_back(reel.GetSymbol(startPos + row));
@@ -37,29 +36,42 @@ SpinResult SpinEngine::PerformSpin(std::mt19937 &rng) {
   result.freeSpinsAwarded = 0;
 
   for (const auto &win : wins) {
-    result.totalWin += win.payout;
+    int payout = win.payout;
+
+    // Primeni 2x multiplier samo ako je free spin
+    if (isFreeSpinMode) {
+      payout *= 2;
+    }
+
+    result.totalWin += payout;
     result.winningLines.push_back(win);
 
     if (win.paylineIndex == -1 || win.symbol == Symbol::Scatter) {
-      result.scatterWin += win.payout;
+      result.scatterWin += payout;
 
+      // Tokom free spinova, triggeruj dodatne free spinove
       if (config.enableFreeSpins && win.matchCount >= 3) {
         result.triggeredFreeSpins = true;
         result.freeSpinsAwarded = GetFreeSpinsCount(win.matchCount);
       }
     } else {
-      result.baseGameWin += win.payout;
+      result.baseGameWin += payout;
     }
   }
 
-  // 4. Simuliraj free spinove
-  if (result.triggeredFreeSpins && config.enableFreeSpins) {
+  // 4. Simuliraj free spinove (samo iz base game-a, ne iz free spinova)
+  if (result.triggeredFreeSpins && config.enableFreeSpins && !isFreeSpinMode) {
     int freeSpinsRemaining = result.freeSpinsAwarded;
-    int freeSpinsMultiplier = 2;
 
     while (freeSpinsRemaining > 0) {
-      auto freeSpinResult = PerformSpin(rng);
-      result.bonusWin += freeSpinResult.totalWin * freeSpinsMultiplier;
+      auto freeSpinResult = PerformSpin(rng, true); // ← true = free spin mode
+      result.bonusWin += freeSpinResult.totalWin;
+
+      // Ako se triggeruju novi free spinovi, dodaj ih
+      if (freeSpinResult.triggeredFreeSpins) {
+        freeSpinsRemaining += freeSpinResult.freeSpinsAwarded;
+      }
+
       freeSpinsRemaining--;
     }
 

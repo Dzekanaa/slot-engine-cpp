@@ -1,13 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
+project(slot_engine VERSION 1.0.0 LANGUAGES CXX)
 
-project(slot_engine)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_STANDARD 20)
-
-include_directories(include)
-
-add_executable(slot
-    tests/main.cpp
+# Source fajlovi
+set(SLOT_ENGINE_SOURCES
     src/reel.cpp
     src/screen.cpp
     src/paytable.cpp
@@ -15,4 +13,13 @@ add_executable(slot
     src/win_evaluator.cpp
     src/game_config.cpp
     src/slot_engine.cpp
+)
+
+# Kreiraj STATIC biblioteku
+add_library(slot_engine STATIC ${SLOT_ENGINE_SOURCES})
+
+# Include direktorijum - KORISTI PUBLIC da bi se propagirao
+target_include_directories(slot_engine
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
