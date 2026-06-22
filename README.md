@@ -30,15 +30,24 @@ A high‑performance, thread‑safe slot machine engine written in C++17. It han
 
 ## Building
 
-```bash
+Clone the repository:
+
 git clone https://github.com/Dzekanaa/slot-engine.git
 cd slot-engine
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
-```
 
-This builds the static library `libslot_engine.a` and optionally the test executable `slot_engine_tests` (if `BUILD_TESTS` is ON).
+Create build directory:
+
+mkdir build && cd build
+
+Configure project with CMake:
+
+cmake ..
+
+Build the project:
+
+make -j$(nproc)
+
+This builds the static library libslot_engine.a and optionally the test executable slot_engine_tests (only when building as main project).
 
 ---
 
@@ -155,8 +164,8 @@ Then include with `#include <slot_engine.h>`.
 
 - **Wild** (`Symbol::Wild`)  
   - Substitutes for any standard symbol on a payline.  
-  - Does not have its own payout – it only helps complete combinations.  
-  - If all symbols on a payline are Wild, no payout is awarded (no base symbol).
+  - Does not have its own payout – it only helps complete combinations (in progress).  
+  - If all symbols on a payline are Wild, no payout is awarded (no base symbol) (in progress).
 
 - **Scatter** (`Symbol::Scatter`)  
   - Pays **regardless of position** – the total number of Scatters on the entire visible screen is counted.  
@@ -166,8 +175,8 @@ Then include with `#include <slot_engine.h>`.
 
 - **Free Spins**  
   - Activated by Scatters.  
-  - During Free Spins, all wins are multiplied by 2.  
-  - Free spins **do not** retrigger additional free spins (prevents infinite loops).  
+  - During Free Spins, all wins are multiplied by 1 (in progress).  
+  - Free spins **do not** retrigger additional free spins (prevents infinite loops) (in progress).  
   - Winnings from Free Spins are accumulated in `SpinResult::bonusWin`.
 
 ---
