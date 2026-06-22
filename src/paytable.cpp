@@ -2,6 +2,7 @@
 
 namespace SlotEngine {
 
+// TODO : change (int)symbol to just symbol for stronger typing
 void PayTable::SetPayout(Symbol symbol, int three, int four, int five) {
   payouts[(int)symbol] = {three, four, five};
 }

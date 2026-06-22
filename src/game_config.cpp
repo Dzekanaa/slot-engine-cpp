@@ -136,9 +136,9 @@ GameConfig GameConfig::CreateClassicConfig() {
   return GameConfig(20); // 20 paylines
 }
 
+// TODO : change how the high and low volitality config works
 GameConfig GameConfig::CreateHighVolatilityConfig() {
   GameConfig config(20);
-  // Veći payouti za retke simbole, manji za česte
   config.paytable.SetPayout(Symbol::A, 10, 50, 250);
   config.paytable.SetPayout(Symbol::K, 6, 30, 150);
   return config;
@@ -146,7 +146,6 @@ GameConfig GameConfig::CreateHighVolatilityConfig() {
 
 GameConfig GameConfig::CreateLowVolatilityConfig() {
   GameConfig config(20);
-  // Manje razlike između payouta
   config.paytable.SetPayout(Symbol::A, 3, 10, 40);
   config.paytable.SetPayout(Symbol::K, 2, 8, 30);
   return config;
