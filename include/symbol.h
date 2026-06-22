@@ -1,8 +1,15 @@
 #pragma once
 #include <string>
 
-namespace SlotEngine { // ← DODAJ
+namespace SlotEngine {
 
+/**
+ * @brief Represents all possible symbols that can appear on the slot reels.
+ *
+ * This enumeration defines the complete set of symbols used by the slot engine,
+ * including special symbols such as Wild and Scatter, as well as regular
+ * paying symbols ranked from A to Five.
+ */
 enum class Symbol {
   Wild,
   Scatter,
@@ -17,7 +24,15 @@ enum class Symbol {
   Six,
   Five
 };
-
+/**
+ * @brief Converts a slot symbol to its string representation.
+ *
+ * Returns a short textual representation of the given sumbol that can be used
+ * for displaying reels, debugging, logging, or printing game result.
+ *
+ * @param s the Symbol to convert.
+ * @return String representation of the symbol (e.g. "W", "S", "A", "10").
+ */
 inline std::string SymbolToString(Symbol s) {
   switch (s) {
   case Symbol::Wild:
